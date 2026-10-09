@@ -55,7 +55,7 @@ try{
    await page.evaluate(async locale=>{
     const {directTouch}=await import('/eagler-host.mjs');const canvas=document.querySelector('canvas');canvas.style.width='min(100vw, calc(100vh * 4 / 3))';canvas.style.height='auto';native.sdl_touch_options(1,0,1);
     if(!core._th11_probe_practice_menu(0,0,1))throw Error(error());step(4);
-    const pending=()=>Array.from(new Float64Array(core.HEAPU8.buffer,core._th11_probe_practice_pending(),14));
+    const pending=()=>Array.from(new Float64Array(core.HEAPU8.buffer,core._th11_probe_practice_pending(),18));
     const initial=pending();initial[5]=9;initial[7]=80;const pointer=core._malloc(initial.length*8);try{new Float64Array(core.HEAPU8.buffer,pointer,initial.length).set(initial);if(!core._th11_practice_configure(pointer,initial.length))throw Error('Mobile test config rejected');}finally{core._free(pointer);}step(3);
     const touch=(type,x,y,id=-100)=>{const r=canvas.getBoundingClientRect();directTouch(native,canvas,{type,id,x:(r.left+x/640*r.width)/innerWidth,y:(r.top+y/480*r.height)/innerHeight},{width:innerWidth,height:innerHeight});step(2);};
     const left=locale==='en-US'?108:locale==='ja-JP'?138:158,top=locale==='en-US'?90:80;
@@ -92,6 +92,7 @@ try{
      const before=core._th11_probe_practice_windows();core.eaglerControls.thpracKeyboardBits=carrier;step();core.eaglerControls.thpracKeyboardBits=0;step();
      if(!((before^core._th11_probe_practice_windows())&window))throw Error(label+' carrier did not toggle its native window');
     }
+    const misses=state()[19];if(core._th11_probe_tracker_death()!==0)throw Error('Replay death wrote live score event');if(state()[19]!==misses+1)throw Error('Replay death did not increment tracker');
     return s;
    },shot);
    await page.screenshot({path:resolve(out,locale+'-shot'+shot+'-overlays.png')});
@@ -99,6 +100,16 @@ try{
    await page.evaluate(()=>{core.eaglerControls.thpracKeyboardBits=1<<9;step();core.eaglerControls.thpracKeyboardBits=0;step();if(!core._th11_return_title())throw Error(error());step(3);if(state()[15])throw Error('Exit leaked live practice');});
   }
   await page.evaluate(()=>{
+   const tools=()=>Array.from(new Int32Array(core.HEAPU8.buffer,core._th11_probe_practice_tools(),12));
+   if(!core._th11_probe_practice_menu(0,0,1))throw Error(error());step(4);key(44);step(120);
+   const carrier=bits=>{core.eaglerControls.thpracKeyboardBits=bits;step();core.eaglerControls.thpracKeyboardBits=0;step(3);};
+   carrier(1);const uBefore=state()[17];carrier(1<<10);if((state()[17]^uBefore)!==32)throw Error('Mobile U carrier did not enable enemy invincibility');carrier(1<<10);carrier(1);
+   carrier(1<<9);
+   const click=(x,y)=>{native.sdl_thprac_mouse(1,x,y);step(2);native.sdl_thprac_mouse(2,x,y);step(3);};
+   click(40,70);const initial=tools();click(16,118);if(tools()[0]===initial[0])throw Error('F12 touch disable-X checkbox did not change actual input owner');
+   click(16,118);if(tools()[0]!==initial[0])throw Error('F12 touch toggle did not restore input owner');
+   carrier(1<<9);if(!core._th11_return_title())throw Error(error());step(4);
+   console.log('F12 touch input-owner toggle and mobile U carrier passed');
    const pose=()=>Array.from(new Int32Array(core.HEAPU8.buffer,core._th11_probe_function_state(),5));
    const start=(character,partner)=>{
     native.sdl_touch_controls(0,0,0,0,0,0);
@@ -108,6 +119,11 @@ try{
     step(3);key(44);step(120);native.sdl_touch_options(1,0,1);native.sdl_touch_controls(1,0,0,0,0,0);step(4);
     if(!pose()[3]||pose()[4])throw Error('C test requires actual active boss and no dialogue');
    };
+   start(1,1);carrier(1<<9);click(16,330);
+   if(!tools()[9])throw Error('F12 touch formation-lock checkbox did not reach the live owner');carrier(1<<9);
+   key(46);if(pose()[2]!==0)throw Error('Purple formation lock failed to override the native C switch');
+   carrier(1<<9);click(16,330);if(tools()[9])throw Error('Formation lock did not turn off');carrier(1<<9);
+   if(!core._th11_return_title())throw Error(error());step(5);
    start(0,0);
    core._th11_probe_function_pose(0);key(46);if(pose()[1]>=99)throw Error('C must not teleport away from an edge');
    core._th11_probe_function_pose(-1);key(46);if(pose()[1]!==99)throw Error('C failed left native gap activation');
@@ -126,7 +142,7 @@ try{
    if(!core._th11_return_title())throw Error(error());step(5);
   });
   console.log(locale+': ordinary C input activates both edge gaps, switches Marisa B once and leaves other shots unchanged');
-  for(const [name,stage,phases] of [['TH11_ST6_MID1',5,1],['TH11_ST6_BOSS9',5,5],['TH11_ST7_END_S9',6,3],['TH11_ST7_END_S10',6,4]])for(let phase=0;phase<phases;++phase){
+  for(const [name,stage,phases] of [['TH11_ST6_MID1',5,1],['TH11_ST6_BOSS9',5,8],['TH11_ST7_END_S9',6,1],['TH11_ST7_END_S10',6,4],['TH11_ST5_MID3',4,4]])for(let phase=0;phase<phases;++phase){
    const section=sections.find(s=>s.key===name).id;
    await page.evaluate(({section,stage,phase})=>{
     if(!core._th11_probe_practice_menu(0,0,1))throw Error(error());step(3);const values=[1,stage,section,phase,0,9,0,80,0,0,50000,0,0,1],pointer=core._malloc(values.length*8);
@@ -136,4 +152,4 @@ try{
   }
   assert.deepEqual(errors,[]);console.log(locale+': original entry/cancel, six shots with boss/chapter warps, Pause-R retry, PRAC save/restore, overlays and all stage-six/Extra special phases passed');await page.close();
  }
-}finally{await browser?.close();await new Promise(r=>server.close(r));}
+}catch(error){const pages=await browser?.pages();if(pages?.length)await pages[pages.length-1].screenshot({path:resolve(out,'purple-failure.png')});throw error;}finally{await browser?.close();await new Promise(r=>server.close(r));}

@@ -7,7 +7,7 @@ import {scanCodes} from './keyboard.mjs';
 import {createBrowserKeyboard} from './directory-keyboard.mjs';
 import {validateMotionReplay} from './motion-replay.mjs';
 import {bindOutsideTouches,normalizeOptions,applyTouchOptions,touchControls,suspendRuntimeAudio,resumeRuntimeAudio,directTouch,installResources as installHostResources,observeMusicWrites,mountManagedData,isSupersededRuntimeError} from './eagler-host.mjs';
-const runtimeBuild=/*TH11_BUILD_INFO*/{version:'development-incomplete',completeGame:false};
+import runtimeBuild from './build-info.mjs';
 const protocol='eagler-touhou/1',game='th11',query=new URLSearchParams(location.search),canvas=document.querySelector('canvas');
 const epoch=Number(query.get('runtimeEpoch'));
 const validEpoch=Number.isSafeInteger(epoch)&&epoch>0;

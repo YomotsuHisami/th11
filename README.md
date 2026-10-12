@@ -1,28 +1,29 @@
-# TH11 portable
+# TH11 地灵殿
 
-This repository contains the source-only TH11 1.00a C++/SDL3 portable and Web implementation.
+[English](README.en.md) · [维护指南](docs/MAINTENANCE.md)
 
-## Layout
+本仓库维护《地灵殿》的 C++/SDL Runtime 及作品适配，作为 eagler-touhou 根目录 Git 子模块保留独立提交历史。游戏状态和原版文件语义由本仓库拥有；Web 启动器和站点交付由主项目 `launcher/web/` 拥有。
 
-- `th11_web/`: TH11 game, SDL runtime, launcher integration, documentation, and source tests.
-- `portable/`: shared GLES renderer, input code, SDL support code, and bundled third-party source dependencies.
+## 构建
 
-## Build
+作为主项目子模块使用时，从 eagler-touhou 根目录执行：
 
-The source tree follows the same shared workspace/toolchain layout used by TH08 and TH10. See `th11_web/docs/BUILD.md` for the current build, validation, and packaging commands.
+```text
+npm run dependencies -- init th11
+npm run runtime -- th11 --emsdk "<SDK>" --font-root "<字体目录>"
+```
 
-Generated build outputs are written below `th11_web/artifacts/` and are intentionally not tracked.
+主项目入口读取实际构建声明，不自动创建 worktree。具体输入及普通/多人选择见[Runtime 构建指南](https://github.com/YomotsuHisami/eagler-touhou/blob/main/docs/playbooks/runtime-build.md)。
 
-## Assets and licensing
+## 当前证据
 
-This repository does not include the original Touhou executable, game data, music, replay, save files, or private development reference material. A runnable package must be assembled locally from files you are legally allowed to use.
+2026-10 工程整理：普通源码构建、目录 Runtime 打包与验证通过；本轮未重跑多人分支和全流程游玩。 这些结果不代表所有关卡、机体、设备和模式均已完成验收。后续修改需要在本次声明之外补充受影响的实际行为验证。
 
-Licensing is component-specific. Keep the notices and licenses beside each bundled component; no blanket license is asserted for the original game or its assets.
+## 源码与资源
 
-## Replay verification
+- `th11_web/cpp/game/`：作品规则、对象和生命周期。
+- `portable/`：本作使用的平台与绘制适配。
+- `third_party/eagler-common`：本作锁定的公共库版本。
+- `portable/build.mjs`：实际构建入口。
 
-`tools/replay-verifier/` adapts the common Replay verifier with all four stored
-Demo replays and Reimu/Yukari Lunatic and Extra clear cases. Original-derived
-golden traces cover 161,977 declared-state ticks. See the
-[commands and scope](tools/replay-verifier/README.md) and
-[acceptance record](tools/replay-verifier/RESULTS.md).
+不随源码提交原版 DATA、音乐、个人存档、Replay 或工具链。许可按各组件保留的 LICENSE/NOTICE 处理；不对原版游戏资源作统一授权声明。

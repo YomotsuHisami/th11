@@ -5,7 +5,7 @@ export const hex=n=>'0x'+(Number(n)>>>0).toString(16);
 export class NativeMachine {
   static async create(bytes,options={}){const machine=new NativeMachine();await machine.init(bytes,options);return machine;}
   async init(bytes,options){
-    const MUnicorn=options.factory??globalThis.MUnicorn??(await import('../../../th08_web/node_modules/@alexaltea/unicorn-js/dist/unicorn_x86.js')).default;
+    const MUnicorn=options.factory??globalThis.MUnicorn??(await import('../../../tools/diagnostics/node_modules/@alexaltea/unicorn-js/dist/unicorn_x86.js')).default;
     const instantiate=WebAssembly.instantiate;
     WebAssembly.instantiate=async(...args)=>{if(options.wasmBinary)args[0]=options.wasmBinary;const result=await instantiate(...args);this.wasmBinary=args[0];this.wasmExports=result.instance?.exports;return result;};
     try{this.uc=await MUnicorn(options);}finally{WebAssembly.instantiate=instantiate;}

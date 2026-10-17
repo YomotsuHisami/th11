@@ -24,11 +24,12 @@ const files=dir=>readdirSync(resolve(root,dir),{withFileTypes:true}).flatMap(e=>
 const source=[...files('cpp/game'),...files('cpp/sdl'),resolve(workspace,'portable/sdl/Renderer.cpp')];
 source.push(...['imgui.cpp','imgui_draw.cpp','imgui_freetype.cpp','imgui_tables.cpp','imgui_widgets.cpp'].map(n=>resolve(imgui,n)));
 const headerFiles=dir=>readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?headerFiles(resolve(dir,e.name)):/\.(h|hpp|inc)$/.test(e.name)?[resolve(dir,e.name)]:[]);
-const headers=[...headerFiles(resolve(root,'cpp')),...headerFiles(resolve(workspace,'portable/sdl')),...headerFiles(resolve(workspace,'portable/input')),resolve(workspace,'third_party/eagler-common/include/eagler/input/DialogueGesture.hpp')].sort();
+const headers=[...headerFiles(resolve(root,'cpp')),...headerFiles(resolve(workspace,'portable/sdl')),...headerFiles(resolve(workspace,'portable/input')),...headerFiles(resolve(workspace,'third_party/eagler-common/include'))].sort();
 const sha=b=>createHash('sha256').update(b).digest('hex');
 const headerHash=sha(headers.map(p=>p+sha(readFileSync(p))).join('\n'));
 const objects=resolve(out,'objects');mkdirSync(objects,{recursive:true});
 const settings=JSON.stringify([compilerVersion,common,headerHash]);
+const capturedInputs=new Map([...source,...headers].map(path=>[path,sha(readFileSync(path))]));
 async function compile(file){const name=relative(workspace,file).replaceAll('\\','_').replaceAll('/','_').replaceAll(':','_').replaceAll('.','_'),object=resolve(objects,name+'.o'),key=sha(settings+sha(readFileSync(file)));if(existsSync(object)&&existsSync(object+'.key')&&readFileSync(object+'.key','utf8')===key)return object;await run([...common,'-c',file,'-o',object]);writeFileSync(object+'.key',key);return object;}
 console.log('Build th11 C++ / SDL3 / Emscripten');
 const objectsBuilt=[];let cursor=0,done=0;await Promise.all(Array.from({length:buildJobs},async()=>{while(cursor<source.length){const i=cursor++;objectsBuilt[i]=await compile(source[i]);if(++done%40===0)console.log(done+'/'+source.length+' translation units');}}));
@@ -36,6 +37,7 @@ const loader=resolve(out,'th11-sdl.mjs');
 const exported=['_malloc','_free','_th11_validate_file','_th11_save_scores','_th11_save_replay','_th11_initialize','_th11_music_enabled','_th11_audio_statistics','_th11_return_title','_th11_restart','_th11_error','_th11_frame','_th11_phase','_th11_pause','_th11_resume','_th11_loop_start','_th11_loop_stop','_th11_loop_pause','_th11_key','_th11_keys_clear','_th11_always_hitbox','_th11_touch','_th11_touch_cancel','_th11_touch_options','_th11_touch_controls','_th11_touch_stick'];
 if(thprac)exported.push('_th11_practice_configure');
 await run([...common,'--no-entry','-sDEFAULT_TO_CXX=1','-sMODULARIZE=1','-sEXPORT_ES6=1','-sENVIRONMENT=web,worker','-sALLOW_MEMORY_GROWTH=1','-sSTACK_SIZE=1048576','-sINITIAL_MEMORY=134217728','-sMAXIMUM_MEMORY=1073741824','-sFILESYSTEM=1','-lidbfs.js','-sEXPORTED_RUNTIME_METHODS=FS,IDBFS,HEAPU8','-sINVOKE_RUN=0','-sEXIT_RUNTIME=0','-sMIN_WEBGL_VERSION=2','-sMAX_WEBGL_VERSION=2','-sGL_SUPPORT_AUTOMATIC_ENABLE_EXTENSIONS=0','-sEXPORTED_FUNCTIONS='+exported.join(','),...objectsBuilt,'-o',loader]);
+for(const [path,digest] of capturedInputs)if(sha(readFileSync(path))!==digest)throw Error('Source changed during compilation: '+path);
 const wasm=readFileSync(loader.replace('.mjs','.wasm')),module=new WebAssembly.Module(wasm);
 const sourceFiles=[...source.map(p=>resolve(workspace,relative(workspace,p))),...headers,fileURLToPath(import.meta.url)].sort();
 const inventory=Object.fromEntries(sourceFiles.map(p=>[relative(workspace,p).replaceAll('\\','/'),sha(readFileSync(p))]));

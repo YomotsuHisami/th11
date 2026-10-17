@@ -23,6 +23,10 @@ tools/
 tools/*
 !tools/replay-verifier/
 !tools/replay-verifier/**
+!tools/diagnostics/
+!tools/diagnostics/*.mjs
+!tools/diagnostics/package.json
+!tools/diagnostics/package-lock.json
 verification/
 deploy/
 FILE-SHA256.json

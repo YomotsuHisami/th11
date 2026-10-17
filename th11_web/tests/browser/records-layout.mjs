@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 
 const game=resolve(import.meta.dirname,'../../..'),workspace=process.env.EAGLER_WORKSPACE;
 if(!workspace)throw Error('Set EAGLER_WORKSPACE to the maintainer workspace');
-const require=createRequire(resolve(workspace,'eagler-touhou/package.json'));
+const require=createRequire(new URL('../../../tools/diagnostics/package.json',import.meta.url));
 const puppeteer=require('puppeteer-core');const {unzipSync}=require('fflate');
 const root=resolve(game,'th11_web'),out=resolve(root,'artifacts/records-layout-browser');mkdirSync(out,{recursive:true});
 const sdk=process.env.EMSDK||resolve(workspace,'th08/tools/emsdk');

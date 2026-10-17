@@ -7,7 +7,7 @@ import {spawnSync} from 'node:child_process';
 import {createServer} from 'node:http';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
-const require=createRequire(new URL('../../../../eagler-touhou/package.json',import.meta.url));
+const require=createRequire(new URL('../../../tools/diagnostics/package.json',import.meta.url));
 const puppeteer=require('puppeteer-core');
 const {unzipSync}=require('fflate');
 const workspace=resolve(fileURLToPath(new URL('../../../../',import.meta.url)));

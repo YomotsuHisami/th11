@@ -3,7 +3,7 @@ import {mkdirSync,writeFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {releaseServer} from '../../../th09_web/scripts/release-server.mjs';
-import {launchBrowser} from '../../../th10_web/scripts/native/browser-launch.mjs';
+import {launchBrowser} from '../../../tools/diagnostics/browser-launch.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url)),out=resolve(root,'artifacts/sdl3/browser/update');mkdirSync(out,{recursive:true});
 let server=await releaseServer({root:resolve(root,'../th09_web/artifacts/sdl-release/site'),port:0});
 const browser=await launchBrowser(),context=await browser.newContext(),page=await context.newPage(),result={physicalDevice:false};

@@ -3,13 +3,15 @@
   "private": true,
   "version": "1.0.5",
   "type": "module",
+  "scripts": {
+    "check": "node check.mjs"
+  },
   "devDependencies": {
     "@alexaltea/unicorn-js": "2.1.4",
+    "fflate": "0.8.3",
     "koffi": "3.2.1",
     "playwright": "1.60.0",
-    "spessasynth_core": "4.3.22",
-    "v86": "0.5.458",
-    "wabt": "1.0.39"
+    "puppeteer-core": "25.10.0"
   },
-  "description": "TH11 原版对照与浏览器诊断的工具依赖"
+  "description": "TH11 原版对照与浏览器诊断工具；不参与游戏 Runtime 构建"
 }

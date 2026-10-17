@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';import{createServer}from'node:http';import{readFileSync,mkdirSync,writeFileSync}from'node:fs';import{resolve}from'node:path';import{fileURLToPath}from'node:url';import{createHash}from'node:crypto';
-import{launchBrowser}from'../../../th10_web/scripts/native/browser-launch.mjs';
+import{launchBrowser}from'../../../tools/diagnostics/browser-launch.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url)),out=resolve(root,'artifacts/sdl3/browser/persistence');mkdirSync(out,{recursive:true});
 const files=new Map(),chunks=[],index={files:[],remote_package_size:0,music:[]};
 function data(filename,path){const b=readFileSync(path),start=index.remote_package_size;chunks.push(b);index.remote_package_size+=b.length;index.files.push({filename,start,end:index.remote_package_size});}

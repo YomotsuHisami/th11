@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {resolve} from 'node:path';
-import {launchBrowser} from '../../../th10_web/scripts/native/browser-launch.mjs';
+import {launchBrowser} from '../../../tools/diagnostics/browser-launch.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url)),out=resolve(root,'artifacts/sdl-release/verification');mkdirSync(out,{recursive:true});
 const base=process.env.TH11_PUBLIC_URL||'https://api.steinsgateon.com',expected=JSON.parse(readFileSync(resolve(root,'artifacts/sdl-release/site/manifest.json')));
 const browser=await launchBrowser(),context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1}),page=await context.newPage(),errors=[];

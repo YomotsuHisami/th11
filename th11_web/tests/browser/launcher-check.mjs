@@ -3,7 +3,7 @@ import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {releaseServer} from '../../../th09_web/scripts/release-server.mjs';
-import {launchBrowser} from '../../../th10_web/scripts/native/browser-launch.mjs';
+import {launchBrowser} from '../../../tools/diagnostics/browser-launch.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url)),out=resolve(root,'artifacts/sdl3/browser/launcher');mkdirSync(out,{recursive:true});
 const run=await releaseServer({root:resolve(root,process.env.TH11_LAUNCHER_SITE||'artifacts/architecture-preview/site'),port:0}),browser=await launchBrowser(),context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1}),page=await context.newPage(),errors=[],result={physicalDevice:false};
 page.setDefaultTimeout(120000);page.on('pageerror',e=>errors.push(e.stack));

@@ -27,7 +27,7 @@ i32 TitleMenu::name_confirm(){
 void TitleMenu::results(u32 pressed,u32 repeat){
     switch(substate){
     case 0:{
-        cursor.count=30;music_request=17;
+        cursor.count=30;music_request=17;scores.settings[0x26+17]=1;
         if(!exists(92)){create(92);create(18,193,2);}create(102);step(1);
         create(selection.character+150);create(selection.character*3+selection.partner+152);create(selection.difficulty+158);
         const i32 rank=scores.insert_score(selection.character*3+selection.partner,selection.difficulty,result_score,8,result_continues,result_timestamp,result_slowdown);

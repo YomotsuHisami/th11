@@ -24,7 +24,12 @@ test('TH11 original title selection state machine and scripted animations',async
  m.replace(0x454de0,'centered records text output',()=>{let arg=6;const text=string(stack(5)).replace(/%(\d*)([ds])/g,(_,width,type)=>{const v=stack(arg++);return(type==='s'?string(v):String(v|0)).padStart(Number(width)||0,' ');});texts.push([m.u32(m.reg('ESI')),stack(1),stack(3),0,stack(4),text]);return 0;});
  m.replace(0x42a0d0,'music track output',()=>{const name=string(stack(2));music=Number(name.match(/th\d+_(\d+)\.wav$/)?.[1]??-1);return 0;},2);
  m.replace(0x435ef0,'empty save replay catalog',()=>0,1);
- m.replace(0x44a9c0,'music transport',()=>{if(stack(1)===3)music=-2;return 0;},2);m.replace(0x42a150,'music title reset',()=>0,2);
+ m.replace(0x44a9c0,'music transport',()=>{if(stack(1)===3)music=-2;return 0;},2);
+ // The original latches the music-room heard flag (gamedata+0x2ddfa+cue) for the
+ // cue it is called with; the core mirrors that per call site. Keep the native
+ // stub faithful for the results-screen cue (0x11, called from 0x43f6e3 only)
+ // so the settings comparison stays byte-equal; other cue writes stay replaced.
+ m.replace(0x42a150,'music heard latch',()=>{const cue=stack(2);if(cue===0x11)m.view(m.u32(0x4a8ebc)+0x2ddfa+cue,1)[0]=1;return 0;},2);
  const selectionGlobals=[0x4a5720,0x4a3824,null,0x4a5710,0x4a5714,0x4c325c,0x4c3260,0x4a5728,0x4a5758,0x4c3258,0x4a5764];
  try{for(const unlocked of[false,true])for(const target of[0,1,2,3,4,5,6,7]){
   if(target===1&&!unlocked)continue;

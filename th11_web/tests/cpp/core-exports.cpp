@@ -301,6 +301,7 @@ API(game_session_title) int game_session_title(GameSession* p){return p->return_
 API(game_session_end_probe) void game_session_end_probe(GameSession* p,i32 continues){p->battle->hud.score.continues=continues;p->economy.score_units=1234567;p->battle->completion.state.exit=StageExit::Ending;}
 API(game_session_loss_probe) void game_session_loss_probe(GameSession* p){p->economy.lives=-1;p->battle->game_over_requested=true;}
 API(game_session_title_menu) TitleMenu* game_session_title_menu(GameSession* p){return p->title.get();}
+API(game_session_score_file) ScoreFile* game_session_score_file(GameSession* p){return &p->scores;}
 API(game_session_pause_menu) PauseMenu* game_session_pause_menu(GameSession* p){return p->pause_menu.get();}
 API(game_session_pause_state) i32 game_session_pause_state(GameSession* p){return p->pause_menu?p->pause_menu->state:-1;}
 API(game_session_stage_data) void* game_session_stage_data(GameSession* p,u32 k){switch(k){case 0:return p->battle&&p->battle->stage?&p->battle->stage->state:nullptr;case 1:return &p->compositor.play_camera;case 2:return &p->compositor.world_camera;case 3:return p->animations.reference_positions;case 4:return &p->animations.camera_delta;case 5:return p->battle?&p->battle->camera_position:nullptr;case 6:return p->battle?&p->battle->enemy_environment.camera_delta:nullptr;default:return &p->compositor.clear_color;}}

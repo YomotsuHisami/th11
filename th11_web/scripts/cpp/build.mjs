@@ -5,7 +5,10 @@ import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 const root=fileURLToPath(new URL('../../',import.meta.url));
-const compiler=resolve(root,'../th10_web/tools/wasi-sdk-34.0-x86_64-windows/bin/clang++.exe');
+// Toolchain fallback chain: the documented Windows wasi-sdk path first, then
+// the TH11_CPP_CXX override, a host-platform wasi-sdk drop, and PATH clang++.
+const wasiSdk=(os,ext)=>resolve(root,`../th10_web/tools/wasi-sdk-34.0-x86_64-${os}/bin/clang++${ext}`),windowsSdk=wasiSdk('windows','.exe'),hostSdk=process.platform==='win32'?null:wasiSdk('linux','');
+const compiler=existsSync(windowsSdk)?windowsSdk:process.env.TH11_CPP_CXX??(hostSdk&&existsSync(hostSdk)?hostSdk:'clang++');
 const out=resolve(root,'artifacts/cpp');mkdirSync(out,{recursive:true});
 const sources=readdirSync(resolve(root,'cpp/game')).filter(n=>n.endsWith('.cpp')).sort().map(n=>'cpp/game/'+n);
 sources.push('tests/cpp/core-exports.cpp');

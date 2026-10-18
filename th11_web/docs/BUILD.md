@@ -12,6 +12,8 @@ Windows 版 Chromium 的 WebGL 驱动信息可能显示 ANGLE / Direct3D11，这
 
 以下命令从工作区根目录运行。使用现有 `th10_web/tools/node.exe`、`th10_web/tools/wasi-sdk-34.0-x86_64-windows`、`tools/emsdk`、Python，以及 `tools/architecture/typescript`。游戏数据来自工作区的日文 1.00a `th11.dat`；最终目标版本与哈希在 `target.json`。
 
+非 Windows 主机上，`scripts/cpp/build.mjs` 按回退链解析 wasi-sdk：先取上述 Windows 路径，缺失时依次尝试 `TH11_CPP_CXX` 环境变量、工作区同版本 Linux SDK（`th10_web/tools/wasi-sdk-34.0-x86_64-linux`）与 PATH 中的 `clang++`；Windows 的工具布局与产物不变。Linux 用系统 Node 运行同一命令即可复现 `artifacts/cpp/game-core-test.wasm`，`node --test --test-concurrency=1 'th11_web/tests/cpp/*.test.mjs'` 可直接执行测试；其中对照原版执行的 oracle 用例还需要本地的原版 `th11.exe` 与 `reference/native/unicorn-bounded.wasm`（二者均不随仓库分发），仅有仓库检出时会按文件缺失报错。
+
 ```powershell
 # 原版比较用 C++ / WASI 核心
 .\th10_web\tools\node.exe th11_web/scripts/cpp/build.mjs

@@ -1,3 +1,9 @@
+> **已归档 | Archived**
+>
+> 本 `eagler` 分支已归档。后续开发与维护请前往 [eagler-touhou/th11](https://github.com/YomotsuHisami/eagler-touhou/tree/launcher-refactor/th11)。
+
+---
+
 # TH11 portable
 
 This repository contains the source-only TH11 1.00a C++/SDL3 portable and Web implementation.
